@@ -50,7 +50,7 @@ class RegisterView extends StatelessWidget {
                 TextFormField(
                   onChanged: ( value ) => registerFormProvider.name = value,
                       validator: ( value ) {
-                        if ( value == null || value.isEmpty ) return 'El nombre de la Marca es obligatario';
+                        if ( value == null || value.isEmpty ) return 'El nombre de la Empresa/Marca es obligatario';
                         return null;
                   },
                   style: TextStyle( color: Colors.white ),
