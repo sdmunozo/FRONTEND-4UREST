@@ -1,3 +1,7 @@
+import 'package:dasha/providers/sidemenu_provider.dart';
+import 'package:dasha/router/router.dart';
+import 'package:dasha/ui/views/blank_view.dart';
+import 'package:dasha/ui/views/icons_view.dart';
 import 'package:dasha/ui/views/login_view.dart';
 import 'package:fluro/fluro.dart';
 import 'package:provider/provider.dart';
@@ -11,6 +15,9 @@ class DashboardHandlers {
     handlerFunc: ( context, params ) {
 
       final authProvider = Provider.of<AuthProvider>(context!);
+      Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl( Flurorouter.dashboardRoute );
+
       if ( authProvider.authStatus == AuthStatus.authenticated )
         return DashboardView();
       else 
@@ -18,7 +25,34 @@ class DashboardHandlers {
     }
   );
 
+  static Handler icons = Handler(
+    handlerFunc: ( context, params ) {
 
+      final authProvider = Provider.of<AuthProvider>(context!);
+      Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl( Flurorouter.iconsRoute );
+
+      if ( authProvider.authStatus == AuthStatus.authenticated )
+        return IconsView();
+      else 
+        return LoginView();
+    }
+  );
+
+
+  static Handler blank = Handler(
+    handlerFunc: ( context, params ) {
+
+      final authProvider = Provider.of<AuthProvider>(context!);
+      Provider.of<SideMenuProvider>(context, listen: false)
+        .setCurrentPageUrl( Flurorouter.blankRoute );
+
+      if ( authProvider.authStatus == AuthStatus.authenticated )
+        return BlankView();
+      else 
+        return LoginView();
+    }
+  );
 
 }
 

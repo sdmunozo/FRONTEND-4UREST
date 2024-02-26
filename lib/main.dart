@@ -1,13 +1,19 @@
-import 'package:dasha/providers/auth_provider.dart';
-import 'package:dasha/router/router.dart';
-import 'package:dasha/services/local_storage.dart';
-import 'package:dasha/services/navigation_service.dart';
-import 'package:dasha/ui/layouts/auth/auth_layout.dart';
-import 'package:dasha/ui/layouts/dashboard/dashboard_layout.dart';
-import 'package:dasha/ui/layouts/splash/splash_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:dasha/ui/layouts/dashboard/dashboard_layout.dart';
+import 'package:dasha/ui/layouts/splash/splash_layout.dart';
+
+import 'package:dasha/router/router.dart';
+
+import 'package:dasha/providers/auth_provider.dart';
+import 'package:dasha/providers/sidemenu_provider.dart';
+
+import 'package:dasha/services/local_storage.dart';
+import 'package:dasha/services/navigation_service.dart';
+
+import 'package:dasha/ui/layouts/auth/auth_layout.dart';
+ 
 void main() async {
 
   await LocalStorage.configurePrefs();
@@ -24,6 +30,12 @@ class AppState extends StatelessWidget {
           lazy: false,
           create: ( _ ) => AuthProvider()
         ),
+
+        ChangeNotifierProvider(
+          lazy: false,
+          create: ( _ ) => SideMenuProvider()
+        )
+
       ],
       child: MyApp(),
     );
@@ -36,7 +48,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Admin Dashboard',
+      title: 'Dasha - 4uRest',
       initialRoute: '/',
       onGenerateRoute: Flurorouter.router.generator,
       navigatorKey: NavigationService.navigatorKey,
