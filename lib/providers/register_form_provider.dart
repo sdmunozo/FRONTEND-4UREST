@@ -4,21 +4,22 @@ class RegisterFormProvider extends ChangeNotifier {
 
   GlobalKey<FormState> formKey = new GlobalKey<FormState>();
 
-  String email    = '';
+  String brand = '';
+  String branch = '';
+  String firstName = '';
+  String lastName = '';
+  String email = '';
   String password = '';
-  String name     = '';
-  String brand    = '';
-  String branch   = '';
-
-
 
   validateForm() {
 
     if ( formKey.currentState!.validate() ) {
       print('Form valid ... Login');
-      print('$email === $password === $name');
+      print('$brand === $branch === $firstName === $lastName === $email === $password');
+      return true;
     } else {
       print('Form not valid');
+      return false;
     }
 
   }

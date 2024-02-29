@@ -24,6 +24,7 @@ class LoginView extends StatelessWidget {
 
 
         return Container(
+          color: Colors.black,
         margin: EdgeInsets.only(top: 100),
         padding: EdgeInsets.symmetric( horizontal: 20 ),
         child: Center(
@@ -34,20 +35,6 @@ class LoginView extends StatelessWidget {
               key: loginFormProvider.formKey,
               child: Column(
                 children: [
-
-                  FittedBox(
-                    fit: BoxFit.contain,
-                    child: Text(
-                      'Para Restaurantes',
-                      style: GoogleFonts.montserratAlternates(
-                        fontSize: 60,
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold
-                      ),
-                    ),
-                  ),
-                  
-                  SizedBox(height: 30,),
                   
                   // Email
                   TextFormField(

@@ -1,8 +1,11 @@
+import 'package:dasha/api/api_4uRest.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'package:dasha/ui/layouts/dashboard/dashboard_layout.dart';
 import 'package:dasha/ui/layouts/splash/splash_layout.dart';
+
+
 
 import 'package:dasha/router/router.dart';
 
@@ -17,6 +20,7 @@ import 'package:dasha/ui/layouts/auth/auth_layout.dart';
 void main() async {
 
   await LocalStorage.configurePrefs();
+  Api4uRest.configureDio();
   Flurorouter.configureRoutes();
   runApp(AppState());
 }

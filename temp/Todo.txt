@@ -1,0 +1,9 @@
+Crear un endpoint que cree un registro de 
+un usuario con los siguientes datos:
+
+first_name
+last_name
+email
+password
+brand
+branch
