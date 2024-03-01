@@ -1,4 +1,5 @@
 import 'package:dasha/api/api_4uRest.dart';
+import 'package:dasha/services/notification_services.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -56,21 +57,20 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       onGenerateRoute: Flurorouter.router.generator,
       navigatorKey: NavigationService.navigatorKey,
+      scaffoldMessengerKey: NotificationsService.messengerKey,
       builder: ( _ , child ){
-        
         final authProvider = Provider.of<AuthProvider>(context);
 
-        if ( authProvider.authStatus == AuthStatus.checking )
+        if (authProvider.authStatus == AuthStatus.checking || authProvider.authStatus == AuthStatus.loading)
           return SplashLayout();
 
-        if( authProvider.authStatus == AuthStatus.authenticated ) {
-          return DashboardLayout( child: child! );
+        if(authProvider.authStatus == AuthStatus.authenticated) {
+          return DashboardLayout(child: child!);
         } else {
-          return AuthLayout( child: child! );
+          return AuthLayout(child: child!);
         }
-              
-
       },
+
       theme: ThemeData.light().copyWith(
         scrollbarTheme: ScrollbarThemeData().copyWith(
           thumbColor: MaterialStateProperty.all(

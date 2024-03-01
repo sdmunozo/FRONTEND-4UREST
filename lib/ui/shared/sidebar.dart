@@ -1,3 +1,4 @@
+import 'package:dasha/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -55,7 +56,9 @@ class Sidebar extends StatelessWidget {
           SizedBox(height: 50,),
           TextSeparator( text: 'Salir' ),
 
-          MenuItem( text: 'Cerrar sesión', icon: Icons.exit_to_app_outlined, onPressed: (){}),
+          MenuItem( text: 'Cerrar sesión', icon: Icons.exit_to_app_outlined, onPressed: (){
+            Provider.of<AuthProvider>(context, listen: false).logout();
+          }),
         ],
       ),
     );

@@ -11,7 +11,7 @@ class Api4uRest {
   static void configureDio() {
 
     // Base del url
-    _dio.options.baseUrl = 'https://1a3c-131-178-102-164.ngrok-free.app';
+    _dio.options.baseUrl = 'https://508b-131-178-102-132.ngrok-free.app';
 
     // Configurar Headers
     _dio.options.headers = {
@@ -50,8 +50,8 @@ static Future post(String path, Map<String, dynamic> data) async {
       if (e.response != null) {
         // El servidor respondió con un código de error que no es 2xx
         print('Datos de respuesta: ${e.response?.data}');
-        print('Encabezados de respuesta: ${e.response?.headers}');
-        print('Opciones de solicitud: ${e.response?.requestOptions}');
+        //print('Encabezados de respuesta: ${e.response?.headers}');
+        //print('Opciones de solicitud: ${e.response?.requestOptions}');
         // Puedes manejar diferentes códigos de estado aquí
         if (e.response?.statusCode == 400) {
           print('Error 400: Solicitud incorrecta');
@@ -60,33 +60,16 @@ static Future post(String path, Map<String, dynamic> data) async {
         throw('Error en el POST: ${e.response?.statusCode}');
       } else {
         // Algo sucedió al preparar la solicitud que desencadenó un error
-        print('Error al enviar la solicitud: ${e.requestOptions}');
-        print('Mensaje de error: ${e.message}');
+        //print('Error al enviar la solicitud: ${e.requestOptions}');
+        //print('Mensaje de error: ${e.message}');
         // Considera lanzar una excepción o manejar el error adecuadamente aquí
         throw('Error al enviar la solicitud: ${e.message}');
       }
     } catch (e) {
       // Manejo de cualquier otro error que no sea DioException
-      print('Error desconocido: $e');
+      //print('Error desconocido: $e');
       throw('Error desconocido: $e');
     }
   }
-
-
-    /*static Future post( String path, Map<String, dynamic> data ) async {
-
-      final formData = FormData.fromMap(data);
-
-      try {
-        
-        final resp = await _dio.post(path, data: formData );
-        return resp.data;
-
-      } catch (e) {
-        print(e);
-        throw('Error en el POST');
-      }
-    }*/
-
 
 }

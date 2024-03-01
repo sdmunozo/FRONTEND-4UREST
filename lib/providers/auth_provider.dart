@@ -1,42 +1,60 @@
-
-
 import 'package:dasha/api/api_4uRest.dart';
 import 'package:dasha/models/http/auth_response.dart';
 import 'package:dasha/router/router.dart';
 import 'package:dasha/services/local_storage.dart';
 import 'package:dasha/services/navigation_service.dart';
+import 'package:dasha/services/notification_services.dart';
 import 'package:flutter/material.dart';
 
 enum AuthStatus {
   checking,
   authenticated,
-  notAuthenticated
+  notAuthenticated,
+  loading
 }
 
 class AuthProvider extends ChangeNotifier {
 
   String? _token;
   AuthStatus authStatus = AuthStatus.checking;
-
+  User? user;
 
   AuthProvider() {
     this.isAuthenticated();
   }
 
 
-  login( String email, String password ) {
+  login( String email, String password ) async {
 
-    // TODO: Petición HTTP
-    this._token = 'adjkfhadfyiu12y3hjasd.ajskhdaks.kjshdkjas';
-    LocalStorage.prefs.setString('token', this._token! );
-    
-    authStatus = AuthStatus.authenticated;
-    notifyListeners();
-    
-    NavigationService.replaceTo(Flurorouter.dashboardRoute);
+      final data = {
+        'userEmail': email,
+        'userPassword': password,
+      };
+
+      try {
+        final json = await Api4uRest.post('/users/login', data);
+        final authResponse = AuthResponse.fromJson(json);
+        this.user = authResponse.user;
+
+        if (authResponse.token != null && authResponse.token.isNotEmpty) {
+          LocalStorage.prefs.setString('token', authResponse.token);
+          authStatus = AuthStatus.authenticated;
+        } else {
+          authStatus = AuthStatus.notAuthenticated;
+        }
+        notifyListeners();
+        if (authStatus == AuthStatus.authenticated) {
+          NavigationService.replaceTo(Flurorouter.dashboardRoute);
+          Api4uRest.configureDio();
+        }
+      } catch (e) {
+        NotificationsService.showSnackbarError('Credenciales inválidas');
+        authStatus = AuthStatus.notAuthenticated;
+        notifyListeners();
+      }
   }
 
-  Future<bool> isAuthenticated() async {
+Future<bool> isAuthenticated() async {
 
     final token = LocalStorage.prefs.getString('token');
 
@@ -46,17 +64,24 @@ class AuthProvider extends ChangeNotifier {
       return false;
     }
 
-    // TODO: ir al backend y comprobar si el JWT es válido
-    
-    await Future.delayed(Duration(milliseconds: 1000 ));
-    authStatus = AuthStatus.authenticated;
-    notifyListeners();
-    return true;
+    try {
+      final resp = await Api4uRest.httpGet('/auth');
+      final authReponse = AuthResponse.fromJson(resp);
+      LocalStorage.prefs.setString('token', authReponse.token );
+
+      this.user = authReponse.user;
+      authStatus = AuthStatus.authenticated;
+      notifyListeners();
+      return true;
+
+    } catch (e) {
+      authStatus = AuthStatus.notAuthenticated;
+      notifyListeners();
+      return false;
+    }
   }
 
-
-register(String brandName, String branchName, String userFirstName, String userLastName, String userEmail, String userPassword) {
-  
+  Future<void> register(String brandName, String branchName, String userFirstName, String userLastName, String userEmail, String userPassword) async {
   final data = {
     'brandName': brandName,
     'branchName': branchName,
@@ -66,65 +91,33 @@ register(String brandName, String branchName, String userFirstName, String userL
     'userPassword': userPassword,
   };
 
-  Api4uRest.post('/users/register', data).then((json) {
-    print(json);
-    // Parsea la respuesta JSON al modelo AuthResponse
+  try {
+    final json = await Api4uRest.post('/users/register', data);
     final authResponse = AuthResponse.fromJson(json);
-    // Aquí puedes establecer el usuario y el token en tu estado global o almacenamiento local
-    // Por ejemplo:
-    // this.user = authResponse.user;
-    // Guarda el token en el almacenamiento local
-    LocalStorage.prefs.setString('token', authResponse.token);
-    // Actualiza el estado de autenticación a autenticado
-    // authStatus = AuthStatus.authenticated;
-    // Navega al dashboard o la vista principal de la aplicación
-    NavigationService.replaceTo(Flurorouter.dashboardRoute);
-    // Configura nuevamente el Dio o tu cliente HTTP si es necesario
-    // CafeApi.configureDio();
-    // Notifica a los listeners para actualizar la UI si es necesario
-    notifyListeners();
+    this.user = authResponse.user;
 
-  }).catchError((e) {
-    print('error en: $e');
-    // Muestra una notificación de error si el registro falla
-    //NotificationsService.showSnackbarError('Error en el registro: Usuario / Password no válidos');
-  });
+    if (authResponse.token != null && authResponse.token.isNotEmpty) {
+      LocalStorage.prefs.setString('token', authResponse.token);
+      authStatus = AuthStatus.authenticated;
+    } else {
+      authStatus = AuthStatus.notAuthenticated;
+    }
+    notifyListeners();
+    if (authStatus == AuthStatus.authenticated) {
+      NavigationService.replaceTo(Flurorouter.dashboardRoute);
+      Api4uRest.configureDio();
+    }
+  } catch (e) {
+    NotificationsService.showSnackbarError('Email inválido');
+    authStatus = AuthStatus.notAuthenticated;
+    notifyListeners();
+  }
 }
 
-
-/*
-register(String brandName, String branchName, String userFirstName, String userLastName, String userEmail, String userPassword, ) {
+  logout() {
+    LocalStorage.prefs.remove('token');
+    authStatus = AuthStatus.notAuthenticated;
+    notifyListeners();
+  }
   
-  final data = {
-    'brandName': brandName,
-    'branchName': branchName,
-    'userFirstName': userFirstName,
-    'userLastName': userLastName,
-    'userEmail': userEmail,
-    'userPassword': userPassword,
-  };
-
-  Api4uRest.post('/users/register', data).then(
-    (json) {
-      print(json);
-
-      final authResponse = AuthResponse.fromMap(json);
-      this.user = authResponse.usuario;
-
-      authStatus = AuthStatus.authenticated;
-      LocalStorage.prefs.setString('token', authResponse.token);
-      NavigationService.replaceTo(Flurorouter.dashboardRoute);
-
-      Api4uRest.configureDio();
-      notifyListeners();
-      
-    }
-  ).catchError((e) {
-    print('error en: $e');
-    //NotificationsService.showSnackbarError('Usuario / Password no válidos');
-  });
-} */
-
-
-
 }
