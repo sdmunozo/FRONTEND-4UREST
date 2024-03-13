@@ -6,26 +6,22 @@ class CustomTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 10),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Image.asset('4uRestFont-white.png',
-          width: 350,),
-          //height: 350,)
+      child: Column(crossAxisAlignment: CrossAxisAlignment.center, children: [
+        Image.asset(
+          '4uRestFont-white.png',
+          width: 350,
+        ),
+        //height: 350,)
 
-          FittedBox(
-            fit: BoxFit.contain,
-            child: Text(
-              'Para Restaurantes',
-              style: GoogleFonts.montserratAlternates(
-                fontSize: 50,
-                color: Colors.white,
-                fontWeight: FontWeight.bold
-              ),
-            ),
-          )
-          
-          ]),
+        FittedBox(
+          fit: BoxFit.contain,
+          child: Text(
+            'Para Restaurantes',
+            style: GoogleFonts.montserratAlternates(
+                fontSize: 50, color: Colors.white, fontWeight: FontWeight.bold),
+          ),
+        )
+      ]),
     );
   }
 }

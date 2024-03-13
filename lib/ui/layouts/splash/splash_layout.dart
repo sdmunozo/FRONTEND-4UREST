@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class SplashLayout extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -10,11 +9,11 @@ class SplashLayout extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             CircularProgressIndicator(),
-            SizedBox( height: 20 ),
+            SizedBox(height: 20),
             Text('Checking...')
           ],
         ),
       ),
     );
   }
-}  
+}

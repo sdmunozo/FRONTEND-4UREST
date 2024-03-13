@@ -6,7 +6,7 @@ class NotificationsIndicator extends StatelessWidget {
     return Container(
       child: Stack(
         children: [
-          Icon( Icons.notifications_none_outlined, color: Colors.grey ),
+          Icon(Icons.notifications_none_outlined, color: Colors.grey),
           Positioned(
             left: 2,
             child: Container(
@@ -21,7 +21,5 @@ class NotificationsIndicator extends StatelessWidget {
   }
 
   BoxDecoration buildBoxDecoration() => BoxDecoration(
-    color: Colors.red,
-    borderRadius: BorderRadius.circular(100)
-  );
+      color: Colors.red, borderRadius: BorderRadius.circular(100));
 }

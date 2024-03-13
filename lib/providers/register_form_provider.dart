@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RegisterFormProvider extends ChangeNotifier {
-
-  GlobalKey<FormState> formKey = new GlobalKey<FormState>();
+  GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   String brand = '';
   String branch = '';
@@ -10,18 +9,48 @@ class RegisterFormProvider extends ChangeNotifier {
   String lastName = '';
   String email = '';
   String password = '';
+  String confirmPassword = '';
 
-  validateForm() {
-
-    if ( formKey.currentState!.validate() ) {
-      //print('Form valid ... Login');
-      //print('$brand === $branch === $firstName === $lastName === $email === $password');
+  bool validateForm() {
+    if (formKey.currentState!.validate()) {
       return true;
     } else {
-      //print('Form not valid');
       return false;
     }
-
   }
 
+  set updateBrand(String value) {
+    brand = value;
+    notifyListeners();
+  }
+
+  set updateBranch(String value) {
+    branch = value;
+    notifyListeners();
+  }
+
+  set updateFirstName(String value) {
+    firstName = value;
+    notifyListeners();
+  }
+
+  set updateLastName(String value) {
+    lastName = value;
+    notifyListeners();
+  }
+
+  set updateEmail(String value) {
+    email = value;
+    notifyListeners();
+  }
+
+  set updatePassword(String value) {
+    password = value;
+    notifyListeners();
+  }
+
+  set updateConfirmPassword(String value) {
+    confirmPassword = value;
+    notifyListeners();
+  }
 }

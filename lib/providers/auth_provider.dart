@@ -10,70 +10,159 @@ enum AuthStatus {
   checking,
   authenticated,
   notAuthenticated,
-  loading
+  loading,
 }
 
 class AuthProvider extends ChangeNotifier {
-
   String? _token;
   AuthStatus authStatus = AuthStatus.checking;
   User? user;
+  Bran? brand;
+  Bran? branch;
+  Bran? selectedBrand;
+  Bran? selectedBranch;
 
   AuthProvider() {
     this.isAuthenticated();
   }
 
+  Future<void> login(String email, String password) async {
+    final data = {
+      'userEmail': email,
+      'userPassword': password,
+    };
 
-  login( String email, String password ) async {
+    try {
+      final json = await Api4uRest.post('/users/login', data);
+      final authResponse = AuthResponse.fromJson(json);
+      this.user = authResponse.user;
+      this.brand = authResponse.brand;
+      this.branch = authResponse.branch;
 
-      final data = {
-        'userEmail': email,
-        'userPassword': password,
-      };
+      if (authResponse.token != null && authResponse.token.isNotEmpty) {
+        LocalStorage.prefs.setString('token', authResponse.token);
+        this._token = authResponse.token;
+        authStatus = AuthStatus.authenticated;
 
-      try {
-        final json = await Api4uRest.post('/users/login', data);
-        final authResponse = AuthResponse.fromJson(json);
-        this.user = authResponse.user;
-
-        if (authResponse.token != null && authResponse.token.isNotEmpty) {
-          LocalStorage.prefs.setString('token', authResponse.token);
-          authStatus = AuthStatus.authenticated;
-        } else {
-          authStatus = AuthStatus.notAuthenticated;
+        if (this.brand != null && this.branch != null) {
+          selectedBrand = this.brand;
+          selectedBranch = this.branch;
+          Api4uRest.setBranchToken(selectedBranch?.id ?? '');
+          notifyListeners();
         }
-        notifyListeners();
-        if (authStatus == AuthStatus.authenticated) {
-          NavigationService.replaceTo(Flurorouter.dashboardRoute);
-          Api4uRest.configureDio();
-        }
-      } catch (e) {
-        NotificationsService.showSnackbarError('Credenciales inválidas');
+      } else {
         authStatus = AuthStatus.notAuthenticated;
-        notifyListeners();
       }
+      notifyListeners();
+      if (authStatus == AuthStatus.authenticated) {
+        NavigationService.replaceTo(Flurorouter.dashboardRoute);
+        Api4uRest.configureDio();
+      }
+    } catch (e) {
+      NotificationsService.showSnackbarError('Credenciales inválidas');
+      authStatus = AuthStatus.notAuthenticated;
+      notifyListeners();
+    }
   }
 
-Future<bool> isAuthenticated() async {
+  Future<void> register(
+      String brandName,
+      String branchName,
+      String userFirstName,
+      String userLastName,
+      String userEmail,
+      String userPassword) async {
+    final data = {
+      'brandName': brandName,
+      'branchName': branchName,
+      'userFirstName': userFirstName,
+      'userLastName': userLastName,
+      'userEmail': userEmail,
+      'userPassword': userPassword,
+    };
 
+    try {
+      final json = await Api4uRest.post('/users/register', data);
+      final authResponse = AuthResponse.fromJson(json);
+      this.user = authResponse.user;
+      this.brand = authResponse.brand;
+      this.branch = authResponse.branch;
+
+      if (authResponse.token != null && authResponse.token.isNotEmpty) {
+        LocalStorage.prefs.setString('token', authResponse.token);
+        this._token = authResponse.token;
+        authStatus = AuthStatus.authenticated;
+
+        if (this.brand != null && this.branch != null) {
+          selectedBrand = this.brand;
+          selectedBranch = this.branch;
+          Api4uRest.setBranchToken(selectedBranch?.id ?? '');
+          notifyListeners();
+        }
+      } else {
+        authStatus = AuthStatus.notAuthenticated;
+      }
+      notifyListeners();
+      if (authStatus == AuthStatus.authenticated) {
+        NavigationService.replaceTo(Flurorouter.dashboardRoute);
+        Api4uRest.configureDio();
+      }
+    } catch (e) {
+      NotificationsService.showSnackbarError('Email inválido');
+      authStatus = AuthStatus.notAuthenticated;
+      notifyListeners();
+    }
+  }
+
+  void logout() {
+    LocalStorage.prefs.remove('token');
+    authStatus = AuthStatus.notAuthenticated;
+    this.brand = null;
+    this.branch = null;
+    this.user = null;
+    this._token = null;
+    this.selectedBrand = null;
+    this.selectedBranch = null;
+    notifyListeners();
+  }
+
+  Future<bool> isAuthenticated() async {
     final token = LocalStorage.prefs.getString('token');
 
-    if( token == null ) {
+    if (token == null) {
       authStatus = AuthStatus.notAuthenticated;
       notifyListeners();
       return false;
     }
 
+    Api4uRest.configureDio();
+
     try {
-      final resp = await Api4uRest.httpGet('/auth');
-      final authReponse = AuthResponse.fromJson(resp);
-      LocalStorage.prefs.setString('token', authReponse.token );
+      final response = await Api4uRest.post('/users/auth', {});
+      if (response != null) {
+        final authResponse = AuthResponse.fromJson(response);
+        LocalStorage.prefs.setString('token', authResponse.token);
+        this._token = authResponse.token;
 
-      this.user = authReponse.user;
-      authStatus = AuthStatus.authenticated;
-      notifyListeners();
-      return true;
+        this.user = authResponse.user;
+        this.brand = authResponse.brand;
+        this.branch = authResponse.branch;
 
+        if (this.brand != null && this.branch != null) {
+          selectedBrand = this.brand;
+          selectedBranch = this.branch;
+          Api4uRest.setBranchToken(selectedBranch?.id ?? '');
+          notifyListeners();
+        }
+
+        authStatus = AuthStatus.authenticated;
+        notifyListeners();
+        return true;
+      } else {
+        authStatus = AuthStatus.notAuthenticated;
+        notifyListeners();
+        return false;
+      }
     } catch (e) {
       authStatus = AuthStatus.notAuthenticated;
       notifyListeners();
@@ -81,43 +170,7 @@ Future<bool> isAuthenticated() async {
     }
   }
 
-  Future<void> register(String brandName, String branchName, String userFirstName, String userLastName, String userEmail, String userPassword) async {
-  final data = {
-    'brandName': brandName,
-    'branchName': branchName,
-    'userFirstName': userFirstName,
-    'userLastName': userLastName,
-    'userEmail': userEmail,
-    'userPassword': userPassword,
-  };
-
-  try {
-    final json = await Api4uRest.post('/users/register', data);
-    final authResponse = AuthResponse.fromJson(json);
-    this.user = authResponse.user;
-
-    if (authResponse.token != null && authResponse.token.isNotEmpty) {
-      LocalStorage.prefs.setString('token', authResponse.token);
-      authStatus = AuthStatus.authenticated;
-    } else {
-      authStatus = AuthStatus.notAuthenticated;
-    }
-    notifyListeners();
-    if (authStatus == AuthStatus.authenticated) {
-      NavigationService.replaceTo(Flurorouter.dashboardRoute);
-      Api4uRest.configureDio();
-    }
-  } catch (e) {
-    NotificationsService.showSnackbarError('Email inválido');
-    authStatus = AuthStatus.notAuthenticated;
-    notifyListeners();
+  Future<String?> getToken() async {
+    return _token;
   }
-}
-
-  logout() {
-    LocalStorage.prefs.remove('token');
-    authStatus = AuthStatus.notAuthenticated;
-    notifyListeners();
-  }
-  
 }
